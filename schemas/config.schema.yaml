@@ -1,0 +1,59 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+
+description: snakemake configuration file
+
+type: object
+
+properties:
+  samples:
+    type: string
+  units:
+    type: string
+  trimming:
+    type: object
+    properties:
+      skip:
+        type: boolean
+      adapter:
+        type: string
+        pattern: "^[ACGT]+$"
+      contaminant_files:
+        type: array
+
+  diffexp:
+    type: object
+    properties:
+      contrasts:
+        type: object
+    required:
+      - contrasts
+
+  params:
+    type: object
+    properties:
+      star:
+        type: string
+      cutadapt-se:
+        type: string
+      cutadapt-pe:
+        type: string
+      bbtrim:
+        type: string
+      kallisto:
+        type: object
+      deseq2:
+        type: object
+
+    required:
+      - star
+      - cutadapt-se
+      - cutadapt-pe
+      - bbtrim
+      - kallisto
+
+required:
+  - samples
+  - units
+  - trimming
+  - diffexp
+  - params

@@ -1,0 +1,77 @@
+###ANALYSIS OPTIONS###
+
+# path or URL to sample sheet (TSV format, columns: sample, condition, ...)
+samples: samples.tsv
+# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2,
+# strandedness). Units are biological replicates. If the column "strandedness" is present (which is optional),
+# can be empty or has one of these values: none, yes or reverse. none is for unstranded
+# protocols, yes an reverse follow the nomenclature used in `htseq-count --reverse`
+# which is referenced in STAR manual section 7, "Counting number of reads per gene".
+units: units.tsv
+
+#Allow trimming and alignment params to be specified by libtype
+trimming:
+  # skip trimming: false or true
+  skip: false
+  #contaminant files, currently only used for the Quant-Seq libraries
+  contaminant_files:
+    - 'resources/polyA.fa.gz'
+    - 'resources/truseq_rna.fa.gz'
+  #NEB ultra directional II adapter sequence.
+  adapter: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  # Put the Quant-seq and NEB trimmed libraries in different directories
+  # so that they can be specified by different rules
+  quantseq_fwd:
+    trimmed_dir: bb_trimmed
+  neb_dirII:
+    trimmed_dir: cutadapt_trimmed
+
+diffexp:
+  # contrasts for the deseq2 results method
+  # q denotes QuantSeq library, r denotes NEB RNA-Seq libraries
+  contrasts:
+    subtractedq-vs-inputq:
+      - subtractedq
+      - inputq
+    subtractedr-vs-inputr:
+      - subtractedr
+      - inputr
+
+params:
+  star: ''
+  cutadapt-se: '-m 1'
+  cutadapt-pe: '-m 1'
+  kallisto:
+    quantseq_fwd: '-l 1 -s 1 --single --fr-stranded'
+    neb_dirII: '-l 1 -s 1 --single --rf-stranded'
+  bbtrim: 'k=13 ktrim=r useshortkmers=t mink=5 qtrim=r trimq=10 minlength=20'
+  #sf_method = c('ratio','poscounts', 'iterate')
+  #use poscounts for testing with small dataset, otherwise ratio
+  deseq2:
+    sf_method: ratio
+
+###INDEX BUILDING OPTIONS###
+
+# Create annotations and index files for the Ribopop paper
+genome_name: dmel_628
+spike_name: sirv
+index_name: dmel_628_sirv
+
+#https://www.ensembl.org/info/data/ftp/index.html
+genome_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.28.dna.toplevel.fa.gz
+genome_gtf_address: ftp://ftp.ensembl.org/pub/release-99/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.28.99.gtf.gz
+cdna_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/cdna/Drosophila_melanogaster.BDGP6.28.cdna.all.fa.gz
+ncrna_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/ncrna/Drosophila_melanogaster.BDGP6.28.ncrna.fa.gz
+sirv_zip_address: https://www.lexogen.com/wp-content/uploads/2018/08/SIRV_Set1_Sequences_170612a-ZIP.zip
+ercc_fasta_address: https://www-s.nist.gov/srmors/certificates/documents/SRM2374_putative_T7_products_NoPolyA_v2.FASTA
+
+include_sirvs: True
+include_erccs: False
+
+#If only using a subset of the ERCCs list here. If empty and include_erccs, then include all
+ercc_subset:
+
+build_star_params:
+  genomeSAsparseD: 4
+  genomeSAindexNbases: 10
+  limitGenomeGenerateRAM: 12000000000

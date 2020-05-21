@@ -1,0 +1,13 @@
+sample	unit	strandedness	libtype	fq1	fq2
+inputq	rep1	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_1.fq.gz
+inputq	rep2	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_2.fq.gz
+inputq	rep3	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_3.fq.gz
+subtractedq	rep1	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_4.fq.gz
+subtractedq	rep2	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_5.fq.gz
+subtractedq	rep3	yes	quantseq_fwd	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_6.fq.gz
+inputr	rep1	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_7.fq.gz
+inputr	rep2	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_8.fq.gz
+inputr	rep3	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_9.fq.gz
+subtractedr	rep1	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_10.fq.gz
+subtractedr	rep2	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_11.fq.gz
+subtractedr	rep3	reverse	neb_dirII	/usr/people/bioc1402/data/sequencing_data/191108_Ribopop/Rpop_12.fq.gz
