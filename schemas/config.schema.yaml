@@ -5,8 +5,6 @@ description: snakemake configuration file
 type: object
 
 properties:
-  samples:
-    type: string
   units:
     type: string
   trimming:
@@ -17,16 +15,6 @@ properties:
       adapter:
         type: string
         pattern: "^[ACGT]+$"
-      contaminant_files:
-        type: array
-
-  diffexp:
-    type: object
-    properties:
-      contrasts:
-        type: object
-    required:
-      - contrasts
 
   params:
     type: object
@@ -37,23 +25,16 @@ properties:
         type: string
       cutadapt-pe:
         type: string
-      bbtrim:
-        type: string
       kallisto:
-        type: object
-      deseq2:
         type: object
 
     required:
       - star
       - cutadapt-se
       - cutadapt-pe
-      - bbtrim
       - kallisto
 
 required:
-  - samples
   - units
   - trimming
-  - diffexp
   - params

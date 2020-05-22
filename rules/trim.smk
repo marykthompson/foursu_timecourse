@@ -27,17 +27,3 @@ rule cutadapt:
         'logs/cutadapt/{sample}-{unit}.log'
     wrapper:
         '0.49.0/bio/cutadapt/se'
-
-rule bbtrim:
-    input:
-        get_fastq
-    output:
-        fastq = 'bb_trimmed/{sample}-{unit}.fastq.gz'
-    params:
-        extra = 'ref={} {}'.format(','.join([os.path.join(snake_dir, i) for i in config['trimming']['contaminant_files']]), config['params']['bbtrim'])
-    log:
-        'logs/bbtrim/{sample}-{unit}.log'
-    conda:
-        '../envs/main.yaml'
-    script:
-        '../scripts/run_bbtrim.py'

@@ -15,7 +15,6 @@ scripts/.snakemake*
 !schemas/*
 !Snakefile
 !config.yaml
-!samples.tsv
 !resources
 !resources/*
 !envs
