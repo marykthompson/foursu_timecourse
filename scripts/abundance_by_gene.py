@@ -24,8 +24,7 @@ with open(txt_2_gene_file, 'r') as f:
 df = pd.read_csv(snakemake.input['abundance'], sep ='\t')
 
 #Produce a table of primary and mature tpm from the Kallisto output
-df['intron'] = df['target_id'].apply(lambda x: '-' in x)
-df['name'] = df['target_id'].apply(lambda x: x.split('-')[0])
+df['intron'] = df['target_id'].apply(lambda x: '_' in x)
 df['gene'] = df['target_id'].map(txt_2_gene)
 
 primary_df = df[df['intron']].groupby('gene').sum()[['tpm', 'est_counts']].rename(columns = {'tpm': 'primary_tpm', 'est_counts': 'primary_est_counts'})
