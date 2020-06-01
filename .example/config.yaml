@@ -61,3 +61,23 @@ build_star_params:
   genomeSAsparseD: 4
   genomeSAindexNbases: 10
   limitGenomeGenerateRAM: 12000000000
+
+###FOURSU TIMEPONT OPTIONS###
+#labeling time, in hours
+labeling_time: 0.25
+
+#if model_subset == True, then INSPEcT will only fit rates for 20 genes
+#This is to make testing faster because the fitting step takes ages..
+model_subset: False
+
+#If remove_spike_inspect == True, then remove the spike-ins prior to the INSPEcT modeling
+remove_spike_inspect: True
+
+#foursu timepoint options (map t number to timepoint in stress response (in hrs))
+#for Josh's NMJ timepoints, this was 15 min of labeling ending at t(min) = 0, 51, 91, 136, 181
+foursu_timepoints:
+  1: 0
+  2: 0.85
+  3: 1.517
+  4: 2.267
+  5: 3.017
