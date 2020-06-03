@@ -27,7 +27,8 @@ rule all:
         'inspect/expDes.csv', 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv', 'inspect/tot_exon_tpm.csv',
         'inspect/tot_intron_tpm.csv',
         'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
-        'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds'
+        'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds',
+        expand('bigwig/{unit.sample}-{unit.unit}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
 
 ##### setup report #####
 report: 'report/workflow.rst'
@@ -40,3 +41,4 @@ include: 'rules/trim.smk'
 include: 'rules/align.smk'
 include: 'rules/qc.smk'
 include: 'rules/rate_modeling.smk'
+include: 'rules/genome_plots.smk'

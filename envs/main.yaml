@@ -8,6 +8,7 @@ dependencies:
   - biopython
   - samtools
   - bedtools
+  - deeptools
   - star=2.5.3a
   - pandas=0.25.3
   - kallisto=0.46.2
