@@ -13,7 +13,8 @@ rule prepare_inspect_input:
         tot_intron_file = 'inspect/tot_intron_tpm.csv'
     params:
         tpts = config['foursu_timepoints'],
-        remove_spike_inspect = config['remove_spike_inspect']
+        remove_spike_inspect = config['remove_spike_inspect'],
+        excluded_exps = config['exps_excluded_from_inspect']
     conda:
         '../envs/main.yaml'
     script:

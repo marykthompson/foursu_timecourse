@@ -13,6 +13,7 @@ nas_intron_file = snakemake.output['nas_intron_file']
 tot_exon_file = snakemake.output['tot_exon_file']
 tot_intron_file = snakemake.output['tot_intron_file']
 remove_spike_inspect = snakemake.params['remove_spike_inspect']
+excluded_exps = snakemake.params['excluded_exps']
 
 #Load abundance data
 df = pd.read_csv(quant_file, index_col = 'gene')
@@ -25,44 +26,20 @@ if remove_spike_inspect == True:
 df['exp_type'] = df['experiment'].apply(lambda x: x.split('_')[0])
 df['timepoint'] = df['experiment'].apply(lambda x: x.split('_')[1])
 df['expname'] = 't' + df['timepoint'] + '_' + df['replicate']
-
-#simply for the test, ideally use integers in the units.tsv file in the pipeline and then don't need:
-df['replicate'].replace(to_replace = 'rep1', value = '1', inplace = True)
-#convert replicate and timepoint to numeric values and sort.
-df['replicate'] = pd.to_numeric(df['replicate'], errors = 'coerce')
+#convert replicate number to integer
+df['rep_num'] = df['replicate'].apply(lambda x: int(x.split('rep')[1]))
 df['timepoint'] = pd.to_numeric(df['timepoint'])
 
-#drop the input5 sample because it doesn't have a matched pulldown sample
-df = df[df['experiment'] !=  'input_5'].copy()
-
-#drop the replicate 1a one
-df.dropna(subset = ['replicate'], inplace = True)
-
-#copy df to make a df2 which would be a like a separate replicate
-df2 = df.copy()
-#in the real experiment df2 would be part of the same df, so concatenate it back at the end.
-
-#how can we stimulate noise for the second replicate?
-#https://stackoverflow.com/questions/14058340/adding-noise-to-a-signal-in-python
-#https://stackoverflow.com/questions/46093073/adding-gaussian-noise-to-a-dataset-of-floating-points-and-save-it-python?rq=1
-
-mu, sigma = 0, 1
-noise1 = np.random.normal(mu, sigma, len(df2))
-noise2 = np.random.normal(mu, sigma, len(df2))
-
-df2['primary_tpm'] = np.clip(df2['primary_tpm'] + noise1, 0, None)
-df2['mature_tpm'] = np.clip(df2['mature_tpm'] + noise2, 0, None)
-
-df2['replicate'] = 2.0
-cdf = pd.concat([df, df2])
-#repeat the expname assignment
-cdf['expname'] = cdf.apply(lambda x: 't%s_%s' % (x['timepoint'], int(x['replicate'])), axis = 1)
+#drop the experiments that shouldn't be included in the analysis
+df = df[~df['experiment'].isin(excluded_exps)].copy()
+#drop non-numerical replicates
+df.dropna(subset = ['rep_num'], inplace = True)
 #sort by replicate and timepoint so that they come out in the correct order
-cdf.sort_values(by = ['replicate', 'timepoint'], inplace = True)
+df.sort_values(by = ['replicate', 'timepoint'], inplace = True)
 
 #these are the timepoints within one replicate
-tpt_array = [tpt_dict[i] for i in cdf['timepoint'].unique() if i in tpt_dict]
-reps = sorted(cdf['replicate'].dropna().unique())
+tpt_array = [tpt_dict[i] for i in df['timepoint'].unique() if i in tpt_dict]
+reps = sorted(df['replicate'].dropna().unique())
 num_reps = len(reps)
 #write timepoints * replicates for input into R -- this is actually referred to as ExpDf, whereas tpts is without replication.
 #Can we use snakemake to give R the tpts and reps directly?
@@ -71,9 +48,9 @@ tdf = pd.DataFrame(a, columns=['timepoints'])
 tdf.to_csv(exp_des_file, index=False)
 #https://stackoverflow.com/questions/29310792/how-to-save-a-list-as-a-csv-file-with-python-with-new-lines
 
-nas_df = cdf[cdf['exp_type'] == 'pd'].copy()
-tot_df = cdf[cdf['exp_type'] == 'input'].copy()
-col_order = cdf['expname'].unique()
+nas_df = df[df['exp_type'] == 'pd'].copy()
+tot_df = df[df['exp_type'] == 'input'].copy()
+col_order = df['expname'].unique()
 
 #write the csv files for INSPEcT
 #it wrote these as timepoint, timept, rep, rep
