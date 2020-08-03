@@ -77,11 +77,11 @@ rule summarize_kallisto:
 
 rule collate_kallisto:
     input:
-        infiles = expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit=units.itertuples())
+        infiles = expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit=units.itertuples()),
     output:
         gene_table = report('results/gene_quantification/summary_abundance_by_gene.csv', '../report/gene_quantification.rst', category = 'Gene Quantification')
     params:
-        units_file = config['units']
+        sample_info = [(i.sample, i.unit) for i in units.itertuples()]
     conda:
         '../envs/main.yaml'
     script:

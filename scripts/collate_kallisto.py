@@ -4,28 +4,21 @@ collate_kallisto.py
 '''
 
 import pandas as pd
-from collections import defaultdict
-
-units_file = snakemake.params['units_file']
-units = pd.read_table(units_file, dtype=str).set_index(['sample', 'unit'], drop=False)
-# enforce str in index
-units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])
-
-exps = units.index.levels[0]
-reps = units.index.levels[1]
 
 abundance_files = snakemake.input['infiles']
-sample_tuples = [(i.sample, i.unit) for i in units.itertuples()]
+sample_info = snakemake.params['sample_info']
 
 counts = [pd.read_csv(f, index_col = 'gene') for f in abundance_files]
 
-df_dict = defaultdict(list)
-for c, info in zip(counts, sample_tuples):
+df_list = []
+for c, info in zip(counts, sample_info):
     experiment, rep = info
-    df_dict[experiment].append(c)
+    c['experiment'] = experiment
+    c['replicate'] = rep
+    df_list.append(c)
 
-exp_dfs = [pd.concat(df_dict[i], keys = reps, names = ['replicate']) for i in exps]
-df = pd.concat(exp_dfs, keys = exps, names = ['experiment'])
-df.set_index('symbol', append = True, inplace = True)
+#combine all experiments and reps into one file
+df = pd.concat(df_list)
+df.set_index(['symbol', 'experiment', 'replicate'], append = True, inplace = True)
 df = df.reorder_levels(['gene', 'symbol', 'experiment', 'replicate'])
 df.to_csv(snakemake.output['gene_table'])

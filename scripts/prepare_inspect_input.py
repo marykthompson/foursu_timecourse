@@ -27,7 +27,8 @@ df['exp_type'] = df['experiment'].apply(lambda x: x.split('_')[0])
 df['timepoint'] = df['experiment'].apply(lambda x: x.split('_')[1])
 df['expname'] = 't' + df['timepoint'] + '_' + df['replicate']
 #convert replicate number to integer
-df['rep_num'] = df['replicate'].apply(lambda x: int(x.split('rep')[1]))
+df['rep_num'] = df['replicate'].apply(lambda x: x.split('rep')[1])
+df['rep_num'] = pd.to_numeric(df['rep_num'], errors = 'coerce')
 df['timepoint'] = pd.to_numeric(df['timepoint'])
 
 #drop the experiments that shouldn't be included in the analysis
