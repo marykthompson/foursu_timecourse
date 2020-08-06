@@ -13,3 +13,4 @@ dependencies:
   - pandas=0.25.3
   - kallisto=0.46.2
   - bioconda::rseqc=3.0
+  - htseq

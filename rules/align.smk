@@ -86,3 +86,30 @@ rule collate_kallisto:
         '../envs/main.yaml'
     script:
         '../scripts/collate_kallisto.py'
+
+rule htseq_count:
+    input:
+        'star/{sample}-{unit}/Aligned.out.bam'
+    output:
+        'htseq/{sample}-{unit}/htseq_count.txt'
+    params:
+        combo_gtf = 'indices/combo_files/{}.gtf'.format(config['index_name'])
+    conda:
+        '../envs/main.yaml'
+    log:
+        'logs/htseq/{sample}-{unit}.log'
+    shell:
+        'htseq-count {input} {params.combo_gtf} > {output}'
+
+rule collate_htseq:
+    input:
+        infiles = expand('htseq/{unit.sample}-{unit.unit}/htseq_count.txt', unit=units.itertuples()),
+        txt_2_gene_file = 'indices/combo_files/{}_txt2gene.txt'.format(config['index_name'])
+    output:
+        gene_table = report('results/gene_quantification/summary_abundance_by_gene_htseq.csv', '../report/gene_quantification_htseq.rst', category = 'Gene Quantification')
+    params:
+        sample_info = [(i.sample, i.unit) for i in units.itertuples()]
+    conda:
+        '../envs/main.yaml'
+    script:
+        '../scripts/collate_htseq.py'

@@ -21,13 +21,14 @@ rule all:
     input:
         'indices/star_index_{index_name}'.format(index_name = config['index_name']),
         'indices/kallisto_index/{}.idx'.format(config['index_name']),
-        'qc/multiqc_report.html',
+        #'qc/multiqc_report.html',
         expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit = units.itertuples()),
         'results/gene_quantification/summary_abundance_by_gene.csv',
-        'inspect/expDes.csv', 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv', 'inspect/tot_exon_tpm.csv',
-        'inspect/tot_intron_tpm.csv',
-        'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
-        'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds',
+        'results/gene_quantification/summary_abundance_by_gene_htseq.csv',
+        #'inspect/expDes.csv', 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv', 'inspect/tot_exon_tpm.csv',
+        #'inspect/tot_intron_tpm.csv',
+        #'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
+        #'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds',
         #expand('bigwig/{unit.sample}-{unit.unit}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
 
 ##### setup report #####
