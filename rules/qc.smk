@@ -2,7 +2,7 @@
 
 rule rseqc_gtf2bed:
     input:
-        'indices/combo_files/{}.gtf'.format(config['index_name'])
+        config['gtf_file']
     output:
         bed = 'qc/rseqc/annotation.bed',
         db = temp('qc/rseqc/annotation.db')

@@ -29,7 +29,7 @@ def get_program_params(wildcards, program = ''):
 rule align:
     input:
         sample = get_fq,
-        star_index = 'indices/star_index_{index_name}'.format(index_name = config['index_name'])
+        star_index = config['star_index']
     output:
         'star/{sample}-{unit}/Aligned.out.bam',
         'star/{sample}-{unit}/ReadsPerGene.out.tab'
@@ -38,7 +38,7 @@ rule align:
     params:
         # optional parameters
         extra='--quantMode GeneCounts --sjdbGTFfile {} {}'.format(
-              'indices/combo_files/{}.gtf'.format(config['index_name']), config['params']['star'])
+              config['gtf_file'], config['params']['star'])
     threads: 24
     conda:
         '../envs/main.yaml'
@@ -48,7 +48,7 @@ rule align:
 rule quantify_kallisto:
     input:
         fastq = get_fq,
-        kallisto_index = 'indices/kallisto_index/{}.idx'.format(config['index_name'])
+        kallisto_index = config['kallisto_index']
     output:
         'kallisto/{sample}-{unit}/abundance.h5',
         'kallisto/{sample}-{unit}/abundance.tsv',
@@ -67,7 +67,7 @@ rule quantify_kallisto:
 rule summarize_kallisto:
     input:
         abundance = 'kallisto/{sample}-{unit}/abundance.tsv',
-        txt_2_gene_file = 'indices/combo_files/{}_txt2gene.txt'.format(config['index_name'])
+        txt_2_gene_file = config['txt_2_gene_file']
     output:
         gene_table = 'kallisto/{sample}-{unit}/abundance_by_gene.csv'
     conda:
@@ -93,7 +93,7 @@ rule htseq_count:
     output:
         'htseq/{sample}-{unit}/htseq_count.txt'
     params:
-        combo_gtf = 'indices/combo_files/{}.gtf'.format(config['index_name'])
+        combo_gtf = config['gtf_file']
     conda:
         '../envs/main.yaml'
     log:
@@ -104,7 +104,7 @@ rule htseq_count:
 rule collate_htseq:
     input:
         infiles = expand('htseq/{unit.sample}-{unit.unit}/htseq_count.txt', unit=units.itertuples()),
-        txt_2_gene_file = 'indices/combo_files/{}_txt2gene.txt'.format(config['index_name'])
+        txt_2_gene_file = config['txt_2_gene_file']
     output:
         gene_table = report('results/gene_quantification/summary_abundance_by_gene_htseq.csv', '../report/gene_quantification_htseq.rst', category = 'Gene Quantification')
     params:
