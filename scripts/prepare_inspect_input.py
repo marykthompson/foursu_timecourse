@@ -36,11 +36,14 @@ df = df[~df['experiment'].isin(excluded_exps)].copy()
 #drop non-numerical replicates
 df.dropna(subset = ['rep_num'], inplace = True)
 #sort by replicate and timepoint so that they come out in the correct order
-df.sort_values(by = ['replicate', 'timepoint'], inplace = True)
+##SHOULDNT THIS BE REPNUM? ISN'T REPLICATE STILL A STRING?
+#df.sort_values(by = ['replicate', 'timepoint'], inplace = True)
+df.sort_values(by = ['rep_num', 'timepoint'], inplace = True)
 
 #these are the timepoints within one replicate
 tpt_array = [tpt_dict[i] for i in df['timepoint'].unique() if i in tpt_dict]
-reps = sorted(df['replicate'].dropna().unique())
+#here also changed from replicate to rep_num
+reps = sorted(df['rep_num'].dropna().unique())
 num_reps = len(reps)
 #write timepoints * replicates for input into R -- this is actually referred to as ExpDf, whereas tpts is without replication.
 #Can we use snakemake to give R the tpts and reps directly?
