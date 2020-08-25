@@ -28,7 +28,9 @@ rule all:
         #'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
         #'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds',
         'inspect2/inspect_data1.rds',
-        'inspect2/inspect_data2.rds'
+        'inspect2/inspect_data2.rds',
+        'inspect2_nf/inspect_data2.rds',
+        'inspect_nf/inspect_data2.rds'
         #expand('bigwig/{unit.sample}-{unit.unit}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
 
 ##### setup report #####

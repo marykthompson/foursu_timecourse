@@ -117,6 +117,51 @@ rule run_inspect2_frombam:
     script:
         '../scripts/inspect_model_rates.R'
 
+#run inspect with non-functional mode (not assuming impulse or sigmoid functions)
+rule run_inspect2_frombam_nf:
+    input:
+        rdata_file = 'inspect2/inspect_data1.rds'
+    output:
+        synth_mod_file = 'inspect2_nf/synth_model.csv',
+        deg_mod_file = 'inspect2_nf/deg_model.csv',
+        proc_mod_file = 'inspect2_nf/proc_model.csv',
+        tot_mod_file = 'inspect2_nf/tot_model.csv',
+        premrna_mod_file = 'inspect2_nf/premrna_model.csv',
+        rate_pval_file = 'inspect2_nf/rate_pvals.csv',
+        gene_class_file = 'inspect2_nf/gene_class.csv',
+        rdata_file = 'inspect2_nf/inspect_data2.rds'
+    params:
+        labeling_time = config['labeling_time'],
+        model_subset = config['model_subset']
+    conda:
+        '../envs/inspect.yaml'
+    log:
+        'logs/inpsect/inspect2_bam_nf.log'
+    script:
+        '../scripts/inspect_model_rates_NF.R'
+
+rule run_inspect2_nf:
+    input:
+        rdata_file = 'inspect/inspect_data1.rds'
+    output:
+        synth_mod_file = 'inspect_nf/synth_model.csv',
+        deg_mod_file = 'inspect_nf/deg_model.csv',
+        proc_mod_file = 'inspect_nf/proc_model.csv',
+        tot_mod_file = 'inspect_nf/tot_model.csv',
+        premrna_mod_file = 'inspect_nf/premrna_model.csv',
+        rate_pval_file = 'inspect_nf/rate_pvals.csv',
+        gene_class_file = 'inspect_nf/gene_class.csv',
+        rdata_file = 'inspect_nf/inspect_data2.rds'
+    params:
+        labeling_time = config['labeling_time'],
+        model_subset = config['model_subset']
+    conda:
+        '../envs/inspect.yaml'
+    log:
+        'logs/inpsect/inspect2_nf.log'
+    script:
+        '../scripts/inspect_model_rates_NF.R'
+
 rule run_inspect1:
     input:
         exp_des_file = 'inspect/expDes.csv',
