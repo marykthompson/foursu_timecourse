@@ -11,9 +11,12 @@ units: units.tsv
 #Allow trimming and alignment params to be specified by libtype
 trimming:
   # skip trimming: false or true
-  skip: false
+  skip: False
   #NEB ultra directional II adapter sequence -- I'm using this for now while I wait to hear back about ovation adaptor
-  adapter: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  #Use adapters for TruSeq as recommended by Nugen
+  #https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html?langsel=/us/
+  adapter1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+  adapter2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
   ovation:
     trimmed_dir: cutadapt_trimmed
 
@@ -22,47 +25,21 @@ params:
   cutadapt-se: '-m 1'
   cutadapt-pe: '-m 1'
   kallisto:
-    ovation: '-l 1 -s 1 --single --fr-stranded'
+    ovation: ''
   #sf_method = c('ratio','poscounts', 'iterate')
   #use poscounts for testing with small dataset, otherwise ratio
 
-###INDEX BUILDING OPTIONS###
-
+###INDICES###
 # Create annotations and index files for the NMJ 4SU timecourse experiment
-genome_name: dmel_628
-spike_name: elex
-index_name: dmel_628_elex
-
-#https://www.ensembl.org/info/data/ftp/index.html
-genome_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.28.dna.toplevel.fa.gz
-genome_gtf_address: ftp://ftp.ensembl.org/pub/release-99/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.28.99.gtf.gz
-cdna_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/cdna/Drosophila_melanogaster.BDGP6.28.cdna.all.fa.gz
-ncrna_fasta_address: ftp://ftp.ensembl.org/pub/release-99/fasta/drosophila_melanogaster/ncrna/Drosophila_melanogaster.BDGP6.28.ncrna.fa.gz
-sirv_zip_address: https://www.lexogen.com/wp-content/uploads/2018/08/SIRV_Set1_Sequences_170612a-ZIP.zip
-ercc_fasta_address: https://www-s.nist.gov/srmors/certificates/documents/SRM2374_putative_T7_products_NoPolyA_v2.FASTA
-
-include_sirvs: True
-include_erccs: True
-
-#If only using a subset of the ERCCs list here. If empty and include_erccs, then include all
-ercc_subset:
-  - ERCC-00057
-  - ERCC-00073
-  - ERCC-00077
-  - ERCC-00104
-  - ERCC-00112
-  - ERCC-00142
-  - ERCC-00150
-  - ERCC-00162
-  - ERCC-00165
-  - ERCC-00168
-
-build_star_params:
-  genomeSAsparseD: 4
-  genomeSAindexNbases: 10
-  limitGenomeGenerateRAM: 12000000000
+kallisto_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/kallisto_index/dmel_628_elex.idx
+star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/star_index_dmel_628_elex
+gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
+txt_2_gene_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex_txt2gene.txt
 
 ###FOURSU TIMEPONT OPTIONS###
+#TxDb to use in R
+txt_db_R: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/nmj_results/results_20818/annotations/dmel_628_elex.sqlite
+
 #labeling time, in hours
 labeling_time: 0.25
 
@@ -73,6 +50,10 @@ model_subset: False
 #If remove_spike_inspect == True, then remove the spike-ins prior to the INSPEcT modeling
 remove_spike_inspect: True
 
+#Exclude the following experiments from INSPECT analysis.
+#If none, use one dash to signify empty list instead of nonetype.
+exps_excluded_from_inspect:
+  -
 #foursu timepoint options (map t number to timepoint in stress response (in hrs))
 #for Josh's NMJ timepoints, this was 15 min of labeling ending at t(min) = 0, 51, 91, 136, 181
 foursu_timepoints:

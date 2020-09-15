@@ -9,10 +9,11 @@ def get_fq(wildcards):
 
         if not is_single_end(**wildcards):
             # paired-end sample
-            return expand('{}/{sample}-{unit}.{group}.fastq.gz'.format(trimmed_dir),
-                          group=[1, 2], **wildcards)
+            return expand("{trimmed}/{sample}-{unit}.{group}.fastq.gz",
+                          group=[1, 2], trimmed = trimmed_dir, **wildcards)
+
         # single end sample
-        return '{}/{sample}-{unit}.fastq.gz'.format(trimmed_dir, **wildcards)
+        return '{trimmed}/{sample}-{unit}.fastq.gz'.format(trimmed = trimmed_dir, **wildcards)
 
 
 def get_program_params(wildcards, program = ''):
