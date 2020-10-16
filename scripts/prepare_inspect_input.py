@@ -1,5 +1,8 @@
-#prepare_inspect_input
-#convert the Kallisto gene quantifications to input tables for the INSPEcT package
+'''
+Prepare_inspect_input
+Convert the Kallisto gene quantifications to input tables for the INSPEcT package.
+Use the columns given by primary_col and mature_col to choose which metric to output.
+'''
 import os
 import pandas as pd
 import numpy as np
@@ -14,6 +17,8 @@ tot_exon_file = snakemake.output['tot_exon_file']
 tot_intron_file = snakemake.output['tot_intron_file']
 remove_spike_inspect = snakemake.params['remove_spike_inspect']
 excluded_exps = snakemake.params['excluded_exps']
+primary_col = snakemake.params['primary_col']
+mature_col = snakemake.params['mature_col']
 
 #Load abundance data
 df = pd.read_csv(quant_file, index_col = 'gene')
@@ -36,8 +41,6 @@ df = df[~df['experiment'].isin(excluded_exps)].copy()
 #drop non-numerical replicates
 df.dropna(subset = ['rep_num'], inplace = True)
 #sort by replicate and timepoint so that they come out in the correct order
-##SHOULDNT THIS BE REPNUM? ISN'T REPLICATE STILL A STRING?
-#df.sort_values(by = ['replicate', 'timepoint'], inplace = True)
 df.sort_values(by = ['rep_num', 'timepoint'], inplace = True)
 
 #these are the timepoints within one replicate
@@ -59,8 +62,8 @@ col_order = df['expname'].unique()
 #write the csv files for INSPEcT
 #it wrote these as timepoint, timept, rep, rep
 #pivot seems to reorder the columns, so need to order them back to the way I specified.
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = 'mature_tpm')[col_order].to_csv(nas_exon_file)
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = 'primary_tpm')[col_order].to_csv(nas_intron_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = mature_col)[col_order].to_csv(nas_exon_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = primary_col)[col_order].to_csv(nas_intron_file)
 
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = 'mature_tpm')[col_order].to_csv(tot_exon_file)
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = 'primary_tpm')[col_order].to_csv(tot_intron_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = mature_col)[col_order].to_csv(tot_exon_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = primary_col)[col_order].to_csv(tot_intron_file)

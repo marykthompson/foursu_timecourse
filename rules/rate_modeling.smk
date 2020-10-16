@@ -43,7 +43,9 @@ rule prepare_inspect_input:
     params:
         tpts = config['foursu_timepoints'],
         remove_spike_inspect = config['remove_spike_inspect'],
-        excluded_exps = config['exps_excluded_from_inspect']
+        excluded_exps = config['exps_excluded_from_inspect'],
+        primary_col = 'TPM_intron',
+        mature_col = 'TPM_exon'
     conda:
         '../envs/main.yaml'
     script:

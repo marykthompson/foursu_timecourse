@@ -1,18 +1,16 @@
 ###ANALYSIS OPTIONS###
 
-# path or URL to sample sheet (TSV format, columns: sample, condition, ...)
-# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2,
+# path or URL to sequencing unit sheet (CSV format, columns: sample, unit, fq1, fq2,
 # strandedness). Units are biological replicates. If the column "strandedness" is present (which is optional),
 # can be empty or has one of these values: none, yes or reverse. none is for unstranded
 # protocols, yes an reverse follow the nomenclature used in `htseq-count --reverse`
 # which is referenced in STAR manual section 7, "Counting number of reads per gene".
-units: units.tsv
+units: units.csv
 
 #Allow trimming and alignment params to be specified by libtype
 trimming:
   # skip trimming: false or true
   skip: False
-  #NEB ultra directional II adapter sequence -- I'm using this for now while I wait to hear back about ovation adaptor
   #Use adapters for TruSeq as recommended by Nugen
   #https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html?langsel=/us/
   adapter1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA

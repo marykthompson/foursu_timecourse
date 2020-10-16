@@ -65,14 +65,36 @@ rule quantify_kallisto:
     script:
         '../scripts/run_kallisto_quant.py'
 
+rule get_feature_lengths:
+    '''
+    Parse the Kallisto output and generate a table with the
+    by gene intron and exon lengths.
+    We only need to read one of the quantification files because
+    they all use the same genome.
+    Also parse the txt_2_gene mapping file and store as a pkl.
+    '''
+    #Do you need to reparse the units file or will it still be available here?
+    input:
+        kallisto_file = 'kallisto/{unit.sample}-{unit.unit}/abundance.tsv'.format(unit = next(units.itertuples())),
+        txt_2_gene_file = config['txt_2_gene_file']
+    params:
+        feature_length_method = 'median'
+    output:
+        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
+        feature_len_pkl = 'results/features/feature_lens.pkl'
+    script:
+        '../scripts/get_feature_lengths.py'
+
 rule summarize_kallisto:
     input:
         abundance = 'kallisto/{sample}-{unit}/abundance.tsv',
-        txt_2_gene_file = config['txt_2_gene_file']
+        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
+        feature_len_pkl = 'results/features/feature_lens.pkl'
     output:
         gene_table = 'kallisto/{sample}-{unit}/abundance_by_gene.csv'
     conda:
         '../envs/main.yaml'
+    threads: 8
     script:
         '../scripts/abundance_by_gene.py'
 

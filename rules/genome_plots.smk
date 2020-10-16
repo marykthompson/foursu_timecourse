@@ -17,6 +17,9 @@ rule sort_and_index:
         '''
 
 #Make the bigwig file. Use BPM scaling and make separate files for the plus and minus strands.
+#Note that the --filterRNAstrand option assumes the dUTP method,
+#so for Ovation libaries, .p.bw files will actually be the minus strand.
+#https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html
 rule make_bigwig:
     input:
         'star/{sample}-{unit}/sorted.bam'
