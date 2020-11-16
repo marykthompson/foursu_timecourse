@@ -34,16 +34,18 @@ star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_
 gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
 txt_2_gene_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex_txt2gene.txt
 
-###FOURSU TIMEPONT OPTIONS###
-#TxDb to use in R
-txt_db_R: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/nmj_results/results_20818/annotations/dmel_628_elex.sqlite
-
 #labeling time, in hours
 labeling_time: 0.25
 
 #if model_subset == True, then INSPEcT will only fit rates for 20 genes
 #This is to make testing faster because the fitting step takes ages..
 model_subset: False
+#Set model seed to 1 for reproducibility, set seed to NULL for random
+#Seed is only used for functional version of modeling.
+#DOES NULL get converted to NULL with snakemake ->R?
+model_seed: 1
+#If model_rates_nonfunctional == True, use the non-functional INSPEcT modeling.
+model_rates_nonfunctional: False
 
 #If remove_spike_inspect == True, then remove the spike-ins prior to the INSPEcT modeling
 remove_spike_inspect: True

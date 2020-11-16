@@ -5,12 +5,12 @@ properties:
   sample:
     type: string
     description: sample name/id the unit has been sequenced from
-  unit:
+  replicate:
     type: string
-    description: unit id
-  strandedness:
+    description: replicate number
+  condition:
     type: string
-    description: one of the values '0', 'yes' or 'reverse' according to protocol strandedness
+    description: string for steady-state, integer for timecourse
   libtype:
     type: string
     description: a defined library type, listed in the config file. Determines the type of adaptor trimming.
@@ -22,7 +22,7 @@ properties:
     description: path to second FASTQ file (leave empty in case of single-end)
 required:
   - sample
-  - unit
+  - replicate
+  - condition
   - fq1
-  - strandedness
   - libtype

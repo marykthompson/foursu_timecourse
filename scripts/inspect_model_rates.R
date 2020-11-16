@@ -24,6 +24,8 @@ rdata_file_out <- snakemake@output[['rdata_file']]
 #params
 labeling_time <- snakemake@params[['labeling_time']]
 model_subset <- snakemake@params[['model_subset']]
+model_rates_nonfunctional <- snakemake@params[['model_rates_nonfunctional']]
+model_seed <- snakemake@params[['model_seed']]
 
 print(paste0('model_subset', model_subset))
 if (model_subset == TRUE) {
@@ -40,7 +42,13 @@ if (model_subset == TRUE) {
 }
 
 print('modeling rates')
-nascentInspObj_sub <- modelRates(nascentInspObj_sub, seed=1)
+#model rates using either functional or non-functional form
+#modelRatesNF doesn't have the seed option
+if (model_rates_nonfunctional == TRUE) {
+  nascentInspObj_sub <- modelRatesNF(nascentInspObj_sub)
+} else {
+  nascentInspObj_sub <- modelRates(nascentInspObj_sub, seed=model_seed)
+}
 
 print('writing modeled rates')
 write.csv(viewModelRates(nascentInspObj_sub, 'synthesis'), file = synth_mod_file)
@@ -55,11 +63,3 @@ write.csv(geneClass(nascentInspObj_sub), file = gene_class_file)
 write.csv(chisqmodel(nascentInspObj_sub), file = chisq_file)
 
 saveRDS(nascentInspObj_sub, file = rdata_file_out)
-#Also possible to get discard the ones with high chisq values but I'm going to do this later.
-#discard<-which(chisq>1e-2)
-#nascentInspObj_reduced<-nascentInspObj_sub[-discard]
-
-#write the variance
-#I don't know why, but variance doesn't seem to be calculated from degradation and processing.
-##write.csv(ratesFirstGuessVar(nascentInspObj, 'synthesis'), file = 'synth_var.csv')
-#how do we get the variability between the rates?

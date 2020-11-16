@@ -8,7 +8,8 @@ import pandas as pd
 import numpy as np
 import sys
 
-tpt_dict = snakemake.params['tpts']
+condition_mapping = snakemake.params['condition_mapping']
+analysis_type = snakemake.params['analysis_type']
 quant_file = snakemake.input['gene_quant_file']
 exp_des_file = snakemake.output['exp_des_file']
 nas_exon_file = snakemake.output['nas_exon_file']
@@ -28,39 +29,47 @@ if remove_spike_inspect == True:
     non_spike_idx = df.index.map(lambda x: not (x.startswith('SIRV') or x.startswith('ERCC')))
     df = df.loc[non_spike_idx].copy()
 
-df['exp_type'] = df['experiment'].apply(lambda x: x.split('_')[0])
-df['timepoint'] = df['experiment'].apply(lambda x: x.split('_')[1])
-df['expname'] = 't' + df['timepoint'] + '_' + df['replicate']
-#convert replicate number to integer
-df['rep_num'] = df['replicate'].apply(lambda x: x.split('rep')[1])
-df['rep_num'] = pd.to_numeric(df['rep_num'], errors = 'coerce')
-df['timepoint'] = pd.to_numeric(df['timepoint'])
+#Maybe also remove the rRNAs. Then rescale?
 
 #drop the experiments that shouldn't be included in the analysis
-df = df[~df['experiment'].isin(excluded_exps)].copy()
-#drop non-numerical replicates
-df.dropna(subset = ['rep_num'], inplace = True)
-#sort by replicate and timepoint so that they come out in the correct order
-df.sort_values(by = ['rep_num', 'timepoint'], inplace = True)
+df = df[~df['sample'].isin(excluded_exps)].copy()
 
-#these are the timepoints within one replicate
-tpt_array = [tpt_dict[i] for i in df['timepoint'].unique() if i in tpt_dict]
-#here also changed from replicate to rep_num
-reps = sorted(df['rep_num'].dropna().unique())
-num_reps = len(reps)
-#write timepoints * replicates for input into R -- this is actually referred to as ExpDf, whereas tpts is without replication.
-#Can we use snakemake to give R the tpts and reps directly?
-a = tpt_array * num_reps
-tdf = pd.DataFrame(a, columns=['timepoints'])
-tdf.to_csv(exp_des_file, index=False)
-#https://stackoverflow.com/questions/29310792/how-to-save-a-list-as-a-csv-file-with-python-with-new-lines
+#enforce numeric replicate numbers and sort by replicate
+df['replicate'] = pd.to_numeric(df['replicate'], errors = 'coerce')
+df.dropna(subset = ['replicate'], inplace = True)
+num_reps = len(df['replicate'].unique())
 
-nas_df = df[df['exp_type'] == 'pd'].copy()
-tot_df = df[df['exp_type'] == 'input'].copy()
+if analysis_type == 'timecourse':
+    df['expname'] = df.apply(lambda x: 't%s_%s' % (x['condition'], x['replicate']), axis = 1)
+    df['condition'] = pd.to_numeric(df['condition'], errors = 'coerce')
+    df.dropna(subset = ['condition'], inplace = True)
+    #sorting needs to be done at the same time:
+    df.sort_values(by = ['replicate', 'condition'], inplace = True)
+    #Write the expDes file
+    #these are the timepoints within one replicate
+    tpt_array = [condition_mapping[i] for i in df['condition'].unique() if i in condition_mapping]
+    #write timepoints * replicates for input into R
+    #this is actually referred to as ExpDf, whereas tpts is without replication.
+    tdf = pd.DataFrame(tpt_array * num_reps, columns=['conditions'])
+    tdf.to_csv(exp_des_file, index=False)
+
+elif analysis_type == 'steadystate':
+    df['expname'] = df.apply(lambda x: '%s_%s' % (x['condition'], x['replicate']), axis = 1)
+    #https://stackoverflow.com/questions/23482668/sorting-by-a-custom-list-in-pandas
+    sorter = condition_mapping
+    df.condition = df.condition.astype('category')
+    df.condition.cat.set_categories(sorter, inplace=True)
+    df.sort_values(['replicate', 'condition'], inplace = True)
+    #INSPEcT just needs the ordered names of the conditions
+    cdf = pd.DataFrame(condition_mapping*num_reps, columns = ['conditions'])
+    cdf.to_csv(exp_des_file, index = False)
+
+nas_df = df[df['RNAtype'] == 'pd'].copy()
+tot_df = df[df['RNAtype'] == 'input'].copy()
 col_order = df['expname'].unique()
 
 #write the csv files for INSPEcT
-#it wrote these as timepoint, timept, rep, rep
+#it writes these as cond1, cond2..., rep2, rep3
 #pivot seems to reorder the columns, so need to order them back to the way I specified.
 nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = mature_col)[col_order].to_csv(nas_exon_file)
 nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = primary_col)[col_order].to_csv(nas_intron_file)
