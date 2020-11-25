@@ -7,34 +7,38 @@ type: object
 properties:
   units:
     type: string
-  trimming:
-    type: object
-    properties:
-      skip:
-        type: boolean
-      adapter:
-        type: string
-        pattern: "^[ACGT]+$"
-
+  skip_trimming:
+    type: boolean
   params:
     type: object
-    properties:
-      star:
-        type: string
-      cutadapt-se:
-        type: string
-      cutadapt-pe:
-        type: string
-      kallisto:
-        type: object
-
-    required:
-      - star
-      - cutadapt-se
-      - cutadapt-pe
-      - kallisto
+  kallisto_index:
+    type: string
+  star_index:
+    type: string
+  gtf_file:
+    type: string
+  txt_2_gene_file:
+    type: string
+  labeling_time:
+    type: number
+  model_subset:
+    type: boolean
+  model_seed:
+    type: integer
+  model_rates_nonfunctional:
+    type: boolean
+  remove_spike_inspect:
+    type: boolean
+  kinetic_analysis_type:
+    type: string
 
 required:
   - units
-  - trimming
+  - skip_trimming
   - params
+  - kallisto_index
+  - star_index
+  - gtf_file
+  - txt_2_gene_file
+  - labeling_time
+  - kinetic_analysis_type

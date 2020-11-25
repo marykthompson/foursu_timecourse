@@ -14,3 +14,4 @@ dependencies:
   - kallisto=0.46.2
   - bioconda::rseqc=3.0
   - htseq
+  - bbmap=38.73

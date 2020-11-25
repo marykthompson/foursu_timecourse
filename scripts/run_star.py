@@ -29,9 +29,10 @@ outprefix = os.path.dirname(snakemake.output[0]) + '/'
 
 shell(
     'STAR '
-    '{snakemake.params.extra} '
+    '--quantMode GeneCounts --sjdbGTFfile '
+    '{snakemake.params.gtf} {snakemake.params.options} '
     '--runThreadN {snakemake.threads} '
-    '--genomeDir {snakemake.input.star_index} '
+    '--genomeDir {snakemake.params.star_index} '
     '--readFilesIn {snakemake.input.sample} '
     '{readcmd} '
     '--outSAMtype BAM Unsorted '

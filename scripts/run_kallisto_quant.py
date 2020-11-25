@@ -23,7 +23,7 @@ shell(
     'kallisto quant '
     '{extra} '  # Optional parameters
     '--threads={snakemake.threads} '  # Number of threads
-    '--index={snakemake.input.kallisto_index} '  # Input file
+    '--index={snakemake.params.kallisto_index} '  # Input file
     '--output-dir={snakemake.params.outdir} '  # Output directory
     '{fastq} '  # Input FASTQ files
     '{log}'  # Logging

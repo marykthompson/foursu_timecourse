@@ -6,7 +6,6 @@ Use bbduk to trim adapters and poly(A) from Quant-Seq reads as recommended by Le
 import os
 from snakemake.shell import shell
 
-extra = snakemake.params.get('extra', '')
 log = snakemake.log_fmt_shell(stdout=True, stderr=True)
 
 sample = [snakemake.input] if isinstance(snakemake.input, str) else snakemake.input
@@ -19,5 +18,6 @@ shell(
     'bbduk.sh '
     'in={snakemake.input} '
     'out={snakemake.output.fastq} '
-    '{snakemake.params.extra} '
+    'ref={snakemake.params.ref} '
+    '{snakemake.params.options} '
     '{log}')

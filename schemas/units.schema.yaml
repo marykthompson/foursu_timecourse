@@ -1,5 +1,5 @@
 $schema: "http://json-schema.org/draft-06/schema#"
-description: row of the units.tsv, representing a sequencing unit, i.e. single-end or paired-end data
+description: row of the units.csv, representing a sequencing unit, i.e. single-end or paired-end data
 type: object
 properties:
   sample:
@@ -11,9 +11,12 @@ properties:
   condition:
     type: string
     description: string for steady-state, integer for timecourse
+  RNAtype:
+    type: string
+    description: one of either input or pd
   libtype:
     type: string
-    description: a defined library type, listed in the config file. Determines the type of adaptor trimming.
+    description: a defined library type, with params in the config file.
   fq1:
     type: string
     description: path to FASTQ file

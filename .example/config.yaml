@@ -1,34 +1,61 @@
 ###ANALYSIS OPTIONS###
 
-# path or URL to sequencing unit sheet (CSV format, columns: sample, unit, fq1, fq2,
-# strandedness). Units are biological replicates. If the column "strandedness" is present (which is optional),
-# can be empty or has one of these values: none, yes or reverse. none is for unstranded
-# protocols, yes an reverse follow the nomenclature used in `htseq-count --reverse`
-# which is referenced in STAR manual section 7, "Counting number of reads per gene".
+# units.csv = path or URL to sequencing unit sheet (CSV format, columns: sample,
+# replicate, condition, RNAtype, fq1, fq2).
+# replicate = biological replicate.
+# RNAtype = input or pd
+# condition = genotype or an integer that will map to a timepoint.
 units: units.csv
+skip_trimming: False
 
-#Allow trimming and alignment params to be specified by libtype
-trimming:
-  # skip trimming: false or true
-  skip: False
-  #Use adapters for TruSeq as recommended by Nugen
-  #https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html?langsel=/us/
-  adapter1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
-  adapter2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
-  ovation:
-    trimmed_dir: cutadapt_trimmed
-
+#Provide program parameters by libtype.
+#Adapter1_3p is used for read1 and single-end. Adapter2_3p is used for read2.
+#Use the trimmed_dir to get snakemake to use cutadapt or bbtrim (QuantSeq only)
 params:
-  star: ''
-  cutadapt-se: '-m 1'
-  cutadapt-pe: '-m 1'
+  trimming:
+    ovation:
+      trimmed_dir: 'trimmed'
+    neb_dirII:
+      trimmed_dir: 'trimmed'
+    quantseq:
+      trimmed_dir: 'bb_trimmed'
+  bbtrim:
+    quantseq:
+      se: 'k=13 ktrim=r useshortkmers=t mink=5 qtrim=r trimq=10 minlength=20'
+  cutadapt:
+    ovation:
+      se: '-m 1'
+      pe: '-m 1'
+      adapter1_3p: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+      adapter2_3p: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+    neb_dirII:
+      se: '-m 1'
+      pe: '-m 1'
+      adapter1_3p: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+      adapter2_3p: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+  star:
+    ovation:
+      se: ''
+      pe: ''
+    neb_dirII:
+      se: ''
+      pe: ''
+    quantseq:
+      se: ''
+      pe: ''
   kallisto:
-    ovation: ''
-  #sf_method = c('ratio','poscounts', 'iterate')
-  #use poscounts for testing with small dataset, otherwise ratio
+    ovation:
+      se: '-l 1 -s 1 --single --fr-stranded'
+      pe: ''
+    neb_dirII:
+      se: '-l 1 -s 1 --single --rf-stranded'
+      pe: ''
+    quantseq:
+      se: '-l 1 -s 1 --single --fr-stranded'
+      pe: ''
 
 ###INDICES###
-# Create annotations and index files for the NMJ 4SU timecourse experiment
+# Annotations and index files for the NMJ 4SU timecourse experiment
 kallisto_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/kallisto_index/dmel_628_elex.idx
 star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/star_index_dmel_628_elex
 gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
@@ -54,11 +81,19 @@ remove_spike_inspect: True
 #If none, use one dash to signify empty list instead of nonetype.
 exps_excluded_from_inspect:
   -
-#foursu timepoint options (map t number to timepoint in stress response (in hrs))
-#for Josh's NMJ timepoints, this was 15 min of labeling ending at t(min) = 0, 51, 91, 136, 181
-foursu_timepoints:
-  1: 0
-  2: 0.85
-  3: 1.517
-  4: 2.267
-  5: 3.017
+
+kinetic_analysis_type: steadystate
+#kinetic_analysis_type: timecourse
+
+#foursu timepoint options (map t number to timepoint in response (in hrs))
+#for Josh's NMJ timepoints, this was 15 min of labeling ending at
+#t(min) = 0, 51, 91, 136, 181
+#foursu_condition_mapping:
+#  1: 0
+#  2: 0.85
+#  3: 1.517
+#  4: 2.267
+#  5: 3.017
+
+foursu_condition_mapping:
+  - wt

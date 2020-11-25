@@ -1,45 +1,34 @@
 def get_fq(wildcards):
-    if config['trimming']['skip']:
+    if config['skip_trimming']:
         # no trimming, use raw reads
         return units.loc[(wildcards.sample, wildcards.rep), ['fq1', 'fq2']].dropna()
     else:
         # yes trimming, use trimmed data
         libtype = units.loc[(wildcards.sample, wildcards.rep), 'libtype']
-        trimmed_dir = config['trimming'][libtype]['trimmed_dir']
+        trimmed_dir = config['params']['trimming'][libtype]['trimmed_dir']
 
         if not is_single_end(**wildcards):
             # paired-end sample
-            return expand("{trimmed}/{sample}-{rep}.{group}.fastq.gz",
-                          group=[1, 2], trimmed = trimmed_dir, **wildcards)
-
+            return expand('{}/{sample}-{rep}.{group}.fastq.gz'.format(trimmed_dir),
+                          group=[1, 2], **wildcards)
         # single end sample
-        return '{trimmed}/{sample}-{rep}.fastq.gz'.format(trimmed = trimmed_dir, **wildcards)
-
-
-def get_program_params(wildcards, program = ''):
-    '''
-    Get the params by libtype. Different libtypes will have different
-    mapping strands, etc.
-    '''
-    libtype = units.loc[(wildcards.sample, wildcards.rep), 'libtype']
-    extra = config['params'][program][libtype]
-    return extra
+        return '{}/{sample}-{rep}.fastq.gz'.format(trimmed_dir, **wildcards)
 
 #in order to process the quantseq and rna-seq files separately,
 #need to create a list of bb_trimmed/*.fq for the quantseq and cutadapt_trimmed/*.fq
 rule align:
     input:
         sample = get_fq,
-        star_index = config['star_index']
     output:
         'star/{sample}-{rep}/Aligned.out.bam',
         'star/{sample}-{rep}/ReadsPerGene.out.tab'
     log:
         'logs/star/{sample}-{rep}.log'
     params:
-        # optional parameters
-        extra='--quantMode GeneCounts --sjdbGTFfile {} {}'.format(
-              config['gtf_file'], config['params']['star'])
+        star_index = config['star_index'],
+        gtf = config['gtf_file'],
+        options = lambda wildcards: get_program_params(wildcards,
+        program = 'star', key = 'options')
     threads: 24
     conda:
         '../envs/main.yaml'
@@ -49,7 +38,6 @@ rule align:
 rule quantify_kallisto:
     input:
         fastq = get_fq,
-        kallisto_index = config['kallisto_index']
     output:
         'kallisto/{sample}-{rep}/abundance.h5',
         'kallisto/{sample}-{rep}/abundance.tsv',
@@ -57,8 +45,9 @@ rule quantify_kallisto:
     log:
         'logs/kallisto/{sample}-{rep}.log'
     params:
+        kallisto_index = config['kallisto_index'],
         outdir = 'kallisto/{sample}-{rep}',
-        extra = lambda wildcards: get_program_params(wildcards, program = 'kallisto')
+        extra = lambda wildcards: get_program_params(wildcards, program = 'kallisto', key = 'options')
     threads: 1
     conda:
         '../envs/main.yaml'
@@ -73,7 +62,6 @@ rule get_feature_lengths:
     they all use the same genome.
     Also parse the txt_2_gene mapping file and store as a pkl.
     '''
-    #Do you need to reparse the units file or will it still be available here?
     input:
         kallisto_file = 'kallisto/{unit.sample}-{unit.replicate}/abundance.tsv'.format(unit = next(units.itertuples())),
         txt_2_gene_file = config['txt_2_gene_file']
