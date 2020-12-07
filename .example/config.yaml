@@ -61,6 +61,13 @@ star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_
 gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
 txt_2_gene_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex_txt2gene.txt
 
+#parameters for by gene expression summary
+#choose the average or median transcript length
+feature_length_method: median
+
+#choose between length and eff_length (effective length) for TPM calculation
+feature_length_column: length
+
 #labeling time, in hours
 labeling_time: 0.25
 

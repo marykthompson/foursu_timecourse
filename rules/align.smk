@@ -66,7 +66,8 @@ rule get_feature_lengths:
         kallisto_file = 'kallisto/{unit.sample}-{unit.replicate}/abundance.tsv'.format(unit = next(units.itertuples())),
         txt_2_gene_file = config['txt_2_gene_file']
     params:
-        feature_length_method = 'median'
+        feature_length_method = config['feature_length_method'],
+        feature_length_column = config['feature_length_column']
     output:
         txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
         feature_len_pkl = 'results/features/feature_lens.pkl'
