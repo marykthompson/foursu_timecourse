@@ -16,20 +16,12 @@ nas_exon_file = snakemake.output['nas_exon_file']
 nas_intron_file = snakemake.output['nas_intron_file']
 tot_exon_file = snakemake.output['tot_exon_file']
 tot_intron_file = snakemake.output['tot_intron_file']
-remove_spike_inspect = snakemake.params['remove_spike_inspect']
 excluded_exps = snakemake.params['excluded_exps']
 primary_col = snakemake.params['primary_col']
 mature_col = snakemake.params['mature_col']
 
 #Load abundance data
 df = pd.read_csv(quant_file, index_col = 'gene')
-
-#Remove spike-in values because they might mess up the inter-library scaling
-if remove_spike_inspect == True:
-    non_spike_idx = df.index.map(lambda x: not (x.startswith('SIRV') or x.startswith('ERCC')))
-    df = df.loc[non_spike_idx].copy()
-
-#Maybe also remove the rRNAs. Then rescale?
 
 #drop the experiments that shouldn't be included in the analysis
 df = df[~df['sample'].isin(excluded_exps)].copy()

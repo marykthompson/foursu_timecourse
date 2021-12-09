@@ -60,7 +60,7 @@ kallisto_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_
 star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/star_index_dmel_628_elex
 gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
 txt_2_gene_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex_txt2gene.txt
-
+rrna_gene_file: /Users/mkthompson/Desktop/Davislab/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/test_genome_build1/sequences/rrna/rrna_genes.csv
 #parameters for by gene expression summary
 #choose the average or median transcript length
 feature_length_method: median
@@ -82,7 +82,9 @@ model_seed: 1
 model_rates_nonfunctional: False
 
 #If remove_spike_inspect == True, then remove the spike-ins prior to the INSPEcT modeling
+#If remove_rRNA_inspect == True, then remove the rRNAs prior to the INSPEcT analysis
 remove_spike_inspect: True
+remove_rrna_inspect: True
 
 #Exclude the following experiments from INSPECT analysis.
 #If none, use one dash to signify empty list instead of nonetype.

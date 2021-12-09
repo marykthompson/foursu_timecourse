@@ -5,6 +5,8 @@ Run by sample
 - Calculate totals of primary and mature transcripts as summed tpm and summed
 estimated counts.
 - Recalculate the TPM based on the by gene exon and intron lengths.
+- For the filtered version, remove the reads assigned to specified features,
+such as spike-in genes and rRNAs, before TPM calculation.
 '''
 
 import pandas as pd
@@ -14,11 +16,24 @@ import sys
 df = pd.read_csv(snakemake.input['abundance'], sep ='\t')
 txt_df = pd.read_pickle(snakemake.input['txt_2_gene_pkl'])
 feat_df = pd.read_pickle(snakemake.input['feature_len_pkl'])
+remove_spike_inspect = snakemake.params['remove_spike_inspect']
+remove_rrna_inspect = snakemake.params['remove_rrna_inspect']
+
+#Remove spike-in values because they might mess up the inter-library scaling
+if remove_spike_inspect == True:
+    non_spike = df['target_id'].apply(lambda x: not (x.startswith('SIRV') or x.startswith('ERCC')))
+    df = df[non_spike].copy()
 
 #Produce a table of primary and mature tpm from the Kallisto output
 df['intron'] = df['target_id'].apply(lambda x: '-I' in x)
 df = df.merge(txt_df, left_on = 'target_id', right_index = True)
 df.rename(columns = {'gene_ID':'gene'}, inplace = True)
+
+#Remove rRNA values because they might mess up the inter-library scaling
+if remove_rrna_inspect == True:
+    rrna_gene_file = snakemake.params['rrna_gene_file']
+    rrna_ids = set(pd.read_csv(rrna_gene_file, header=None)[0].values)
+    df = df[~df.gene.isin(rrna_ids)].copy()
 
 #Get sums of tpm and est_counts by gene
 #https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#aggregation

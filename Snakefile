@@ -19,19 +19,16 @@ validate(units, schema = 'schemas/units.schema.yaml')
 ##### target rules #####
 rule all:
     input:
-        #'qc/multiqc_report.html',
-        #expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit = units.itertuples()),
-        #'results/gene_quantification/summary_abundance_by_gene.csv',
-        #'results/gene_quantification/summary_abundance_by_gene_htseq.csv',
-        'inspect/expDes.csv', 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv', 'inspect/tot_exon_tpm.csv',
-        #'inspect/tot_intron_tpm.csv',
-        'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
-        #'inspect/tot_levels.csv', 'inspect/premrna_levels.csv', 'inspect/inspect_data2.rds',
-        #'inspect2/inspect_data1.rds',
-        #'inspect2/inspect_data2.rds',
-        #'inspect2_nf/inspect_data2.rds',
-        #'inspect_nf/inspect_data2.rds'
-        #expand('bigwig/{unit.sample}-{unit.unit}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
+        'qc/multiqc_report.html',
+        # expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit = units.itertuples()),
+        # 'results/gene_quantification/summary_abundance_by_gene.csv',
+        # 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv'
+        # 'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
+        list(set(expand('inspect/inspect_data1_{unit.replicate}.rds', unit = units.itertuples()))),
+        'inspect/inspect_data2.rds',
+        'results/gene_quantification/summary_abundance_by_gene.csv',
+        # expand('kallisto/{unit.sample}-{unit.replicate}/abundance_by_gene.csv', unit=units.itertuples()),
+        # expand('bigwig/{unit.sample}-{unit.replicate}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
 
 ##### setup report #####
 report: 'report/workflow.rst'

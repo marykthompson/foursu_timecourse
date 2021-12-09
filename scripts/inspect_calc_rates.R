@@ -67,5 +67,4 @@ write.csv(ratesFirstGuessVar(nascentInspObj, 'synthesis'), file = synth_var_file
 write.csv(ratesFirstGuessVar(nascentInspObj, 'total'), file = total_var_file)
 write.csv(ratesFirstGuessVar(nascentInspObj, 'preMRNA'), file = premrna_var_file)
 
-#add the output of the variances here!
 saveRDS(nascentInspObj, file = rdata_file)

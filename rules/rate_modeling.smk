@@ -5,7 +5,7 @@ import sys
 #Prepare INSPEcT input files from the Kallisto quantification.
 rule prepare_inspect_input:
     input:
-        gene_quant_file = 'results/gene_quantification/summary_abundance_by_gene.csv'
+        gene_quant_file = 'results/gene_quantification/summary_abundance_by_gene_filtered.csv'
     output:
         exp_des_file = 'inspect/expDes.csv',
         nas_exon_file = 'inspect/nas_exon_tpm.csv',
@@ -14,11 +14,10 @@ rule prepare_inspect_input:
         tot_intron_file = 'inspect/tot_intron_tpm.csv'
     params:
         condition_mapping = config['foursu_condition_mapping'],
-        remove_spike_inspect = config['remove_spike_inspect'],
         excluded_exps = config['exps_excluded_from_inspect'],
         analysis_type = config['kinetic_analysis_type'],
-        primary_col = 'TPM_intron',
-        mature_col = 'TPM_exon'
+        primary_col = 'primary_tpm_recalc',
+        mature_col = 'mature_tpm_recalc'
     conda:
         '../envs/main.yaml'
     script:
@@ -79,3 +78,27 @@ rule run_inspect2:
         'logs/inspect/inspect2.log'
     script:
         '../scripts/inspect_model_rates.R'
+
+#Run INSPEcT with each rep separately
+rule run_inspect_byrep:
+    input:
+        exp_des_file = 'inspect/expDes.csv',
+        nas_exon_file = 'inspect/nas_exon_tpm.csv',
+        nas_intron_file = 'inspect/nas_intron_tpm.csv',
+        tot_exon_file = 'inspect/tot_exon_tpm.csv',
+        tot_intron_file = 'inspect/tot_intron_tpm.csv'
+    output:
+        list(set(expand('inspect/synthesis_{unit.replicate}.csv', unit = units.itertuples()))),
+        list(set(expand('inspect/degradation_{unit.replicate}.csv', unit = units.itertuples()))),
+        list(set(expand('inspect/processing_{unit.replicate}.csv', unit = units.itertuples()))),
+        list(set(expand('inspect/total_{unit.replicate}.csv', unit = units.itertuples()))),
+        list(set(expand('inspect/premrna_{unit.replicate}.csv', unit = units.itertuples()))),
+        list(set(expand('inspect/inspect_data1_{unit.replicate}.rds', unit = units.itertuples())))
+    params:
+        labeling_time = config['labeling_time'],
+    conda:
+        '../envs/inspect.yaml'
+    log:
+        'logs/inspect/inspect_byrep.log'
+    script:
+        '../scripts/inspect_calc_rates_byrep.R'

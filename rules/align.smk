@@ -6,11 +6,9 @@ def get_fq(wildcards):
         # yes trimming, use trimmed data
         libtype = units.loc[(wildcards.sample, wildcards.rep), 'libtype']
         trimmed_dir = config['params']['trimming'][libtype]['trimmed_dir']
-
         if not is_single_end(**wildcards):
-            # paired-end sample
-            return expand('{}/{sample}-{rep}.{group}.fastq.gz'.format(trimmed_dir),
-                          group=[1, 2], **wildcards)
+            return expand('%s/{sample}-{rep}.{group}.fastq.gz' % trimmed_dir,
+                           group=[1, 2], **wildcards)
         # single end sample
         return '{}/{sample}-{rep}.fastq.gz'.format(trimmed_dir, **wildcards)
 
@@ -79,8 +77,29 @@ rule summarize_kallisto:
         abundance = 'kallisto/{sample}-{rep}/abundance.tsv',
         txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
         feature_len_pkl = 'results/features/feature_lens.pkl'
+    params:
+        remove_spike_inspect = False,
+        remove_rrna_inspect = False
     output:
         gene_table = 'kallisto/{sample}-{rep}/abundance_by_gene.csv'
+    conda:
+        '../envs/main.yaml'
+    threads: 8
+    script:
+        '../scripts/abundance_by_gene.py'
+
+#summarize the kallisto quant after removing specified genes
+rule summarize_kallisto_filtered:
+    input:
+        abundance = 'kallisto/{sample}-{rep}/abundance.tsv',
+        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
+        feature_len_pkl = 'results/features/feature_lens.pkl'
+    params:
+        remove_spike_inspect = config['remove_spike_inspect'],
+        remove_rrna_inspect = config['remove_rrna_inspect'],
+        rrna_gene_file = config['rrna_gene_file']
+    output:
+        gene_table = 'kallisto_filtered/{sample}-{rep}/abundance_by_gene.csv'
     conda:
         '../envs/main.yaml'
     threads: 8
@@ -92,6 +111,18 @@ rule collate_kallisto:
         infiles = expand('kallisto/{unit.sample}-{unit.replicate}/abundance_by_gene.csv', unit=units.itertuples()),
     output:
         gene_table = report('results/gene_quantification/summary_abundance_by_gene.csv', '../report/gene_quantification.rst', category = 'Gene Quantification')
+    params:
+        sample_info = [(i.sample, i.replicate, i.condition, i.RNAtype) for i in units.itertuples()]
+    conda:
+        '../envs/main.yaml'
+    script:
+        '../scripts/collate_kallisto.py'
+
+rule collate_kallisto_filtered:
+    input:
+        infiles = expand('kallisto_filtered/{unit.sample}-{unit.replicate}/abundance_by_gene.csv', unit=units.itertuples()),
+    output:
+        gene_table = report('results/gene_quantification/summary_abundance_by_gene_filtered.csv', '../report/gene_quantification_filtered.rst', category = 'Gene Quantification')
     params:
         sample_info = [(i.sample, i.replicate, i.condition, i.RNAtype) for i in units.itertuples()]
     conda:
