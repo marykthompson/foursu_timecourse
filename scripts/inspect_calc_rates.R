@@ -28,7 +28,7 @@ premrna_var_file <- snakemake@output[['premrna_var_file']]
 
 rdata_file <- snakemake@output[['rdata_file']]
 
-#Read in nascent and mature exonic and intronic counts and convert to matrix
+#Read in nascent and total exonic and intronic counts and convert to matrix
 nasexon_ma <- as.matrix(read.csv(nas_exon_file, row.names = 'gene'))
 nasintron_ma <- as.matrix(read.csv(nas_intron_file, row.names = 'gene'))
 totexon_ma <- as.matrix(read.csv(tot_exon_file, row.names = 'gene'))

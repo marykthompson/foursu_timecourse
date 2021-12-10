@@ -14,9 +14,9 @@ txt_df['symbol'].fillna(txt_df['gene_ID'], inplace = True)
 txt_df.to_pickle(snakemake.output['txt_2_gene_pkl'])
 
 df = pd.read_csv(snakemake.input['kallisto_file'], sep ='\t')
-#Produce a table of primary and mature tpm from the Kallisto output
-df['intron'] = df['target_id'].apply(lambda x: '-I' in x)
-df['transcript'] = df['target_id'].apply(lambda x: x.split('-I')[0])
+#Produce a table of intronic and exonic tpm from the Kallisto output
+df['intron'] = df['target_id'].apply(lambda x: '_I' in x)
+df['transcript'] = df['target_id'].apply(lambda x: x.split('_I')[0])
 
 #add in the gene_ID and symbol columns
 df = df.merge(txt_df, left_on = 'target_id', right_index = True)

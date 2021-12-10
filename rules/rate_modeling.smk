@@ -16,8 +16,8 @@ rule prepare_inspect_input:
         condition_mapping = config['foursu_condition_mapping'],
         excluded_exps = config['exps_excluded_from_inspect'],
         analysis_type = config['kinetic_analysis_type'],
-        primary_col = 'primary_tpm_recalc',
-        mature_col = 'mature_tpm_recalc'
+        intronic_col = 'intronic_tpm_recalc',
+        exonic_col = 'exonic_tpm_recalc'
     conda:
         '../envs/main.yaml'
     script:

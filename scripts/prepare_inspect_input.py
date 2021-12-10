@@ -1,7 +1,7 @@
 '''
 Prepare_inspect_input
 Convert the Kallisto gene quantifications to input tables for the INSPEcT package.
-Use the columns given by primary_col and mature_col to choose which metric to output.
+Use the columns given by intronic_col and exonic_col to choose which metric to output.
 '''
 import os
 import pandas as pd
@@ -17,8 +17,8 @@ nas_intron_file = snakemake.output['nas_intron_file']
 tot_exon_file = snakemake.output['tot_exon_file']
 tot_intron_file = snakemake.output['tot_intron_file']
 excluded_exps = snakemake.params['excluded_exps']
-primary_col = snakemake.params['primary_col']
-mature_col = snakemake.params['mature_col']
+intronic_col = snakemake.params['intronic_col']
+exonic_col = snakemake.params['exonic_col']
 
 #Load abundance data
 df = pd.read_csv(quant_file, index_col = 'gene')
@@ -63,8 +63,8 @@ col_order = df['expname'].unique()
 #write the csv files for INSPEcT
 #it writes these as cond1, cond2..., rep2, rep3
 #pivot seems to reorder the columns, so need to order them back to the way I specified.
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = mature_col)[col_order].to_csv(nas_exon_file)
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = primary_col)[col_order].to_csv(nas_intron_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[col_order].to_csv(nas_exon_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[col_order].to_csv(nas_intron_file)
 
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = mature_col)[col_order].to_csv(tot_exon_file)
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = primary_col)[col_order].to_csv(tot_intron_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[col_order].to_csv(tot_exon_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[col_order].to_csv(tot_intron_file)
