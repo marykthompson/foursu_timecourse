@@ -53,6 +53,13 @@ params:
     quantseq:
       se: '-l 1 -s 1 --single --fr-stranded'
       pe: ''
+  dexseq:
+    ovation:
+      se: '-f bam -s yes'
+      pe: '-f bam -p yes -s yes'
+
+###DIRECTORIES###
+dexseq_scripts_dir: /usr/local/lib/R/4.0/site-library/DEXSeq/python_scripts/
 
 ###INDICES###
 # Annotations and index files for the NMJ 4SU timecourse experiment
@@ -61,6 +68,9 @@ star_index: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_
 gtf_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex.gtf
 txt_2_gene_file: /Users/maryk.thompson/Desktop/Davislab/OneDriveNexus365/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/foursu_test1/indices/combo_files/dmel_628_elex_txt2gene.txt
 rrna_gene_file: /Users/mkthompson/Desktop/Davislab/3.4_NMJ_4Tu_4sU/3.4e_pipeline_dev/test_genome_build1/sequences/rrna/rrna_genes.csv
+#problematic_ids refers to the genes with transcripts annotated on both strands, causes issues for DEXSeq
+problematic_ids: /Users/mkthompson/Desktop/Davislab/3.4_NMJ_4Tu_4sU/3.4o_AS_UTR/dexseq_prep/resources/problematic_genes.txt
+
 #parameters for by gene expression summary
 #choose the average or median transcript length
 feature_length_method: median
