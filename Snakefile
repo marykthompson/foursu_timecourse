@@ -22,7 +22,7 @@ rule all:
         # 'qc/multiqc_report.html',
         # expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit = units.itertuples()),
         # 'results/gene_quantification/summary_abundance_by_gene.csv',
-        # 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv'
+        # 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv',
         # 'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
         # list(set(expand('inspect/inspect_data1_{unit.replicate}.rds', unit = units.itertuples()))),
         # 'inspect/inspect_data2.rds',

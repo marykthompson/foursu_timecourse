@@ -30,18 +30,15 @@ totintron_ma <- as.matrix(read.csv(tot_intron_file, row.names = 'gene'))
 exp_des <- read.csv(exp_des_file)$conditions
 num_tpts <- length(unique(exp_des))
 tpts <- exp_des[1: num_tpts]
-print('exp_des', exp_des)
-print('num_tpts', num_tpts)
-print('tpts', tpts)
 
 i = 1
 r = c(1:num_tpts)
 while (i <= length(exp_des)/num_tpts) {
-  nasexon_r <- nasexon_ma[, r]
-  nasexon_ma_r <- nasexon_ma[,r]
-  nasintron_ma_r <- nasintron_ma[,r]
-  totexon_ma_r <- totexon_ma[,r]
-  totintron_ma_r <- totintron_ma[,r]
+  nasexon_r <- nasexon_ma[, r, drop=FALSE]
+  nasexon_ma_r <- nasexon_ma[,r, drop=FALSE]
+  nasintron_ma_r <- nasintron_ma[,r, drop=FALSE]
+  totexon_ma_r <- totexon_ma[,r, drop=FALSE]
+  totintron_ma_r <- totintron_ma[,r, drop=FALSE]
   exp_des_r <- exp_des[r]
 
   nas_L_r <- list('exonsAbundances' = nasexon_ma_r, 'intronsAbundances' = nasintron_ma_r)
@@ -52,6 +49,31 @@ while (i <= length(exp_des)/num_tpts) {
 
   totExp_plgem_r <-quantifyExpressionsFromTrAbundance(trAbundaces = tot_L_r,
                                                       experimentalDesign = exp_des_r)
+
+  if (ncol(nasExp_plgem_r$exonsExpressions) != length(unique(exp_des_r))) {
+    nas_exonsExpressions2 = t(nasExp_plgem_r$exonsExpressions)
+    nas_exonsVariance2 = t(nasExp_plgem_r$exonsVariance)
+    nas_intronsExpressions2 = t(nasExp_plgem_r$intronsExpressions)
+    nas_intronsVariance2 = t(nasExp_plgem_r$intronsVariance)
+
+    tot_exonsExpressions2 = t(totExp_plgem_r$exonsExpressions)
+    tot_exonsVariance2 = t(totExp_plgem_r$exonsVariance)
+    tot_intronsExpressions2 = t(totExp_plgem_r$intronsExpressions)
+    tot_intronsVariance2 = t(totExp_plgem_r$intronsVariance)
+
+    #add the row names back to the variance matrices
+    rownames(nas_exonsVariance2) <- rownames(nas_exonsExpressions2)
+    rownames(nas_intronsVariance2) <- rownames(nas_intronsExpressions2)
+
+    rownames(tot_exonsVariance2) <- rownames(tot_exonsExpressions2)
+    rownames(tot_intronsVariance2) <- rownames(tot_intronsExpressions2)
+
+    nasExp_plgem_r <- list(exonsExpressions = nas_exonsExpressions2, exonsVariance = nas_exonsVariance2,
+                         intronsExpressions = nas_intronsExpressions2, intronsVariance = nas_intronsVariance2)
+
+    totExp_plgem_r <- list(exonsExpressions = tot_exonsExpressions2, exonsVariance = tot_exonsVariance2,
+                         intronsExpressions = tot_intronsExpressions2, intronsVariance = tot_intronsVariance2)
+  }
 
   nascentInspObj_r <-newINSPEcT(tpts = tpts
                                 ,labeling_time = labeling_time

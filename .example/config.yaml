@@ -17,6 +17,8 @@ params:
       trimmed_dir: 'trimmed'
     neb_dirII:
       trimmed_dir: 'trimmed'
+    lex_sense:
+      trimmed_dir: 'trimmed'
     quantseq:
       trimmed_dir: 'bb_trimmed'
   bbtrim:
@@ -33,6 +35,11 @@ params:
       pe: '-m 1'
       adapter1_3p: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
       adapter2_3p: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+    lex_sense:
+      se: '-m 1'
+      pe: '-m 1'
+      adapter1_3p: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+      adapter2_3p: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
   star:
     ovation:
       se: ''
@@ -41,6 +48,9 @@ params:
       se: ''
       pe: ''
     quantseq:
+      se: ''
+      pe: ''
+    lex_sense:
       se: ''
       pe: ''
   kallisto:
@@ -52,6 +62,9 @@ params:
       pe: ''
     quantseq:
       se: '-l 1 -s 1 --single --fr-stranded'
+      pe: ''
+    lex_sense:
+      se: '-l 1 -s 1 --single --rf-stranded'
       pe: ''
   dexseq:
     ovation:
