@@ -23,11 +23,11 @@ rule all:
         # expand('kallisto/{unit.sample}-{unit.unit}/abundance_by_gene.csv', unit = units.itertuples()),
         # 'results/gene_quantification/summary_abundance_by_gene.csv',
         # 'inspect/nas_exon_tpm.csv', 'inspect/nas_intron_tpm.csv',
-        # 'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
+         'inspect/synth_rates.csv', 'inspect/deg_rates.csv', 'inspect/proc_rates.csv',
         # list(set(expand('inspect/inspect_data1_{unit.replicate}.rds', unit = units.itertuples()))),
         # 'inspect/inspect_data2.rds',
         # 'results/gene_quantification/summary_abundance_by_gene.csv',
-        list(set(expand('dexseq/{unit.sample}-{unit.replicate}.txt', unit = units.itertuples())))
+        #list(set(expand('dexseq/{unit.sample}-{unit.replicate}.txt', unit = units.itertuples())))
         # expand('kallisto/{unit.sample}-{unit.replicate}/abundance_by_gene.csv', unit=units.itertuples()),
         # expand('bigwig/{unit.sample}-{unit.replicate}.{strand}.bw', unit = units.itertuples(), strand = ['p', 'm'])
 

@@ -11,7 +11,8 @@ import sys
 condition_mapping = snakemake.params['condition_mapping']
 analysis_type = snakemake.params['analysis_type']
 quant_file = snakemake.input['gene_quant_file']
-exp_des_file = snakemake.output['exp_des_file']
+nas_exp_des_file = snakemake.output['nas_exp_des_file']
+tot_exp_des_file = snakemake.output['tot_exp_des_file']
 nas_exon_file = snakemake.output['nas_exon_file']
 nas_intron_file = snakemake.output['nas_intron_file']
 tot_exon_file = snakemake.output['tot_exon_file']
@@ -37,13 +38,6 @@ if analysis_type == 'timecourse':
     df.dropna(subset = ['condition'], inplace = True)
     #sorting needs to be done at the same time:
     df.sort_values(by = ['replicate', 'condition'], inplace = True)
-    #Write the expDes file
-    #these are the timepoints within one replicate
-    tpt_array = [condition_mapping[i] for i in df['condition'].unique() if i in condition_mapping]
-    #write timepoints * replicates for input into R
-    #this is actually referred to as ExpDf, whereas tpts is without replication.
-    tdf = pd.DataFrame(tpt_array * num_reps, columns=['conditions'])
-    tdf.to_csv(exp_des_file, index=False)
 
 elif analysis_type == 'steadystate':
     df['expname'] = df.apply(lambda x: '%s_%s' % (x['condition'], x['replicate']), axis = 1)
@@ -52,19 +46,28 @@ elif analysis_type == 'steadystate':
     df.condition = df.condition.astype('category')
     df.condition.cat.set_categories(sorter, inplace=True)
     df.sort_values(['replicate', 'condition'], inplace = True)
-    #INSPEcT just needs the ordered names of the conditions
-    cdf = pd.DataFrame(condition_mapping*num_reps, columns = ['conditions'])
-    cdf.to_csv(exp_des_file, index = False)
 
 nas_df = df[df['RNAtype'] == 'pd'].copy()
 tot_df = df[df['RNAtype'] == 'input'].copy()
-col_order = df['expname'].unique()
+nas_col_order = nas_df['expname'].unique()
+tot_col_order = tot_df['expname'].unique()
 
+if analysis_type == 'timecourse':
+    nas_cond = [condition_mapping[int(i.split('_')[0][1:])] for i in nas_col_order]
+    tot_cond = [condition_mapping[int(i.split('_')[0][1:])] for i in tot_col_order]
+elif analysis_type == 'steadystate':
+    nas_cond = [i.split('_')[0] for i in nas_col_order]
+    tot_cond = [i.split('_')[0] for i in tot_col_order]
+
+nas_exp_df = pd.DataFrame(nas_cond, columns = ['conditions'])
+tot_exp_df = pd.DataFrame(tot_cond, columns = ['conditions'])
+nas_exp_df.to_csv(nas_exp_des_file, index = False)
+tot_exp_df.to_csv(tot_exp_des_file, index = False)
 #write the csv files for INSPEcT
 #it writes these as cond1, cond2..., rep2, rep3
 #pivot seems to reorder the columns, so need to order them back to the way I specified.
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[col_order].to_csv(nas_exon_file)
-nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[col_order].to_csv(nas_intron_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[nas_col_order].to_csv(nas_exon_file)
+nas_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[nas_col_order].to_csv(nas_intron_file)
 
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[col_order].to_csv(tot_exon_file)
-tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[col_order].to_csv(tot_intron_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = exonic_col)[tot_col_order].to_csv(tot_exon_file)
+tot_df.reset_index().pivot(index = 'gene', columns = 'expname', values = intronic_col)[tot_col_order].to_csv(tot_intron_file)

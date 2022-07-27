@@ -11,7 +11,8 @@ nas_exon_file <- snakemake@input[['nas_exon_file']]
 nas_intron_file <- snakemake@input[['nas_intron_file']]
 tot_exon_file <- snakemake@input[['tot_exon_file']]
 tot_intron_file <- snakemake@input[['tot_intron_file']]
-exp_des_file <- snakemake@input[['exp_des_file']]
+nas_exp_des_file <- snakemake@input[['nas_exp_des_file']]
+tot_exp_des_file <- snakemake@input[['tot_exp_des_file']]
 
 #params
 labeling_time <- snakemake@params[['labeling_time']]
@@ -36,24 +37,24 @@ totintron_ma <- as.matrix(read.csv(tot_intron_file, row.names = 'gene'))
 
 #Read in experimental design (tpts, then reps): e.g. t1_1 t2_1, t3_1, t1_2, t2_2, t3_2
 #or e.g.: wt_1, syp_1, wt_2, syp_2,...
-exp_des <- read.csv(exp_des_file)$conditions
+nas_exp_des <- read.csv(nas_exp_des_file)$conditions
+tot_exp_des <- read.csv(tot_exp_des_file)$conditions
+
 nasL <- list('exonsAbundances' = nasexon_ma, 'intronsAbundances' = nasintron_ma)
 totL <- list('exonsAbundances' = totexon_ma, 'intronsAbundances' = totintron_ma)
 
 #Get variances from the replicates
 nasExp_plgem<-quantifyExpressionsFromTrAbundance(trAbundaces = nasL,
-                                                 experimentalDesign = exp_des)
+                                                 experimentalDesign = nas_exp_des)
 
 totExp_plgem<-quantifyExpressionsFromTrAbundance(trAbundaces = totL,
-                                                 experimentalDesign = exp_des)
+                                                 experimentalDesign = tot_exp_des)
 
-# We will assume from the previous step that the exp_des is exactly each
-# timepoint * n reps.
 # There is a bug in INSPEcT in which it reduces one condition matrix to vector.
 # Transpose the row/columns in order to fix the matrix subsetting problem which
 # becomes a problem with one condition.
 
-if (ncol(nasExp_plgem$exonsExpressions) != length(unique(exp_des))) {
+if (ncol(nasExp_plgem$exonsExpressions) != length(unique(nas_exp_des))) {
   nas_exonsExpressions2 = t(nasExp_plgem$exonsExpressions)
   nas_exonsVariance2 = t(nasExp_plgem$exonsVariance)
   nas_intronsExpressions2 = t(nasExp_plgem$intronsExpressions)
@@ -78,9 +79,12 @@ if (ncol(nasExp_plgem$exonsExpressions) != length(unique(exp_des))) {
                        intronsExpressions = tot_intronsExpressions2, intronsVariance = tot_intronsVariance2)
 }
 
-num_tpts <- length(unique(exp_des))
-tpts <- exp_des[1: num_tpts]
+#This is only true for timecourses maybe?
+#Will this work for multiple steadystate conditions?
 
+num_tpts <- length(unique(nas_exp_des))
+tpts <- nas_exp_des[1: num_tpts]
+#for steady-state data, timepoints will actually be conditions
 nascentInspObj<-newINSPEcT(tpts = tpts
                            ,labeling_time = labeling_time
                            ,nascentExpressions = nasExp_plgem

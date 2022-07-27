@@ -7,9 +7,10 @@ rule prepare_inspect_input:
     input:
         gene_quant_file = 'results/gene_quantification/summary_abundance_by_gene_filtered.csv'
     output:
-        exp_des_file = 'inspect/expDes.csv',
+        nas_exp_des_file = 'inspect/nas_expDes.csv',
         nas_exon_file = 'inspect/nas_exon_tpm.csv',
         nas_intron_file = 'inspect/nas_intron_tpm.csv',
+        tot_exp_des_file = 'inspect/tot_expDes.csv',
         tot_exon_file = 'inspect/tot_exon_tpm.csv',
         tot_intron_file = 'inspect/tot_intron_tpm.csv'
     params:
@@ -29,7 +30,8 @@ rule prepare_inspect_input:
 #& writes the expDes file to input into R
 rule run_inspect1:
     input:
-        exp_des_file = 'inspect/expDes.csv',
+        nas_exp_des_file = 'inspect/nas_expDes.csv',
+        tot_exp_des_file = 'inspect/tot_expDes.csv',
         nas_exon_file = 'inspect/nas_exon_tpm.csv',
         nas_intron_file = 'inspect/nas_intron_tpm.csv',
         tot_exon_file = 'inspect/tot_exon_tpm.csv',
@@ -82,7 +84,8 @@ rule run_inspect2:
 #Run INSPEcT with each rep separately
 rule run_inspect_byrep:
     input:
-        exp_des_file = 'inspect/expDes.csv',
+        nas_exp_des_file = 'inspect/nas_expDes.csv',
+        tot_exp_des_file = 'inspect/tot_expDes.csv',
         nas_exon_file = 'inspect/nas_exon_tpm.csv',
         nas_intron_file = 'inspect/nas_intron_tpm.csv',
         tot_exon_file = 'inspect/tot_exon_tpm.csv',
