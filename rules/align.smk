@@ -52,34 +52,15 @@ rule quantify_kallisto:
     script:
         '../scripts/run_kallisto_quant.py'
 
-rule get_feature_lengths:
-    '''
-    Parse the Kallisto output and generate a table with the
-    by gene intron and exon lengths.
-    We only need to read one of the quantification files because
-    they all use the same genome.
-    Also parse the txt_2_gene mapping file and store as a pkl.
-    '''
-    input:
-        kallisto_file = 'kallisto/{unit.sample}-{unit.replicate}/abundance.tsv'.format(unit = next(units.itertuples())),
-        txt_2_gene_file = config['txt_2_gene_file']
-    params:
-        feature_length_method = config['feature_length_method'],
-        feature_length_column = config['feature_length_column']
-    output:
-        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
-        feature_len_pkl = 'results/features/feature_lens.pkl'
-    script:
-        '../scripts/get_feature_lengths.py'
-
 rule summarize_kallisto:
     input:
         abundance = 'kallisto/{sample}-{rep}/abundance.tsv',
-        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
-        feature_len_pkl = 'results/features/feature_lens.pkl'
     params:
         remove_spike_inspect = False,
-        remove_rrna_inspect = False
+        remove_rrna_inspect = False,
+        txt_2_gene_file = config['txt_2_gene_file'],
+        len_file = config['gene_len_file'],
+        intron_marker = config['intron_marker']
     output:
         gene_table = 'kallisto/{sample}-{rep}/abundance_by_gene.csv'
     conda:
@@ -92,12 +73,13 @@ rule summarize_kallisto:
 rule summarize_kallisto_filtered:
     input:
         abundance = 'kallisto/{sample}-{rep}/abundance.tsv',
-        txt_2_gene_pkl = 'results/features/txt_2_gene.pkl',
-        feature_len_pkl = 'results/features/feature_lens.pkl'
     params:
         remove_spike_inspect = config['remove_spike_inspect'],
         remove_rrna_inspect = config['remove_rrna_inspect'],
-        rrna_gene_file = config['rrna_gene_file']
+        txt_2_gene_file = config['txt_2_gene_file'],
+        len_file = config['gene_len_file'],
+        intron_marker = config['intron_marker'],
+        rrna_gene_file = config['rrna_gene_file'],
     output:
         gene_table = 'kallisto_filtered/{sample}-{rep}/abundance_by_gene.csv'
     conda:
