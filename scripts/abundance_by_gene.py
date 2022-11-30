@@ -32,7 +32,7 @@ df['intron'] = df['target_id'].apply(lambda x: intron_marker in x)
 feat_df = pd.merge(txt_df, len_df, left_on='gene', right_on='gene')
 df2 = pd.merge(df, feat_df[['transcript', 'gene']], left_on='target_id', right_on='transcript')
 
-#Remove rRNA values because they might mess up the inter-library scaling
+# Remove rRNA values because they might mess up the inter-library scaling
 if remove_rrna_inspect == True:
     rrna_gene_file = snakemake.params['rrna_gene_file']
     rrna_ids = set(pd.read_csv(rrna_gene_file, header=None)[0].values)
@@ -45,9 +45,7 @@ exonic_df = df2[~df2['intron']].groupby('gene').agg(exonic_tpm = pd.NamedAgg(col
 
 df3 = pd.concat([intronic_df, exonic_df], axis = 1, sort = False)
 df3.fillna(value = 0, inplace = True)
-
-df3 = pd.merge(df3, feat_df[['gene', 'symbol', 'intron_length', 'exon_length']], left_index=True, right_on='gene')
-
+df3 = pd.merge(df3.reset_index(), feat_df[['gene', 'symbol', 'intron_length', 'exon_length']].drop_duplicates(subset=['gene']), left_on='gene', right_on='gene', how='left')
 df3['RPL_exon'] = df3['exonic_est_counts']/df3['exon_length']
 df3['RPL_intron'] = df3['intronic_est_counts']/df3['intron_length']
 #fillna to replace NAs caused by non-existent intron/exon division by 0.
@@ -55,7 +53,6 @@ df3[['RPL_exon', 'RPL_intron']] = df3[['RPL_exon', 'RPL_intron']].fillna(value =
 RPL_sum = df3['RPL_exon'].sum() + df3['RPL_intron'].sum()
 df3['exonic_tpm_recalc'] = 1e6*df3['RPL_exon']/RPL_sum
 df3['intronic_tpm_recalc'] = 1e6*df3['RPL_intron']/RPL_sum
-df3.index.name = 'gene'
 
 #Also combine the intronic and exonic counts
 #call it summed_tpm and summed_est_counts to indicate it's summed over all transcripts and intronic, exonic
