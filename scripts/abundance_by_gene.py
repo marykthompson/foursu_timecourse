@@ -42,26 +42,24 @@ intronic_df = df2[df2['intron']].groupby('gene').agg(intronic_tpm = pd.NamedAgg(
                       intronic_est_counts = pd.NamedAgg(column = 'est_counts', aggfunc = 'sum'))
 exonic_df = df2[~df2['intron']].groupby('gene').agg(exonic_tpm = pd.NamedAgg(column = 'tpm', aggfunc = 'sum'),
                       exonic_est_counts = pd.NamedAgg(column = 'est_counts', aggfunc = 'sum'))
-
 df3 = pd.concat([intronic_df, exonic_df], axis = 1, sort = False)
+df3.index.name = 'gene'
 df3.fillna(value = 0, inplace = True)
 df3 = pd.merge(df3.reset_index(), feat_df[['gene', 'symbol', 'intron_length', 'exon_length']].drop_duplicates(subset=['gene']), left_on='gene', right_on='gene', how='left')
 df3['RPL_exon'] = df3['exonic_est_counts']/df3['exon_length']
 df3['RPL_intron'] = df3['intronic_est_counts']/df3['intron_length']
 #fillna to replace NAs caused by non-existent intron/exon division by 0.
-df3[['RPL_exon', 'RPL_intron']] = df3[['RPL_exon', 'RPL_intron']].fillna(value = 0)
+df3[['RPL_exon', 'RPL_intron']] = df3[['RPL_exon', 'RPL_intron']].replace(np.inf, np.nan).fillna(value = 0)
 RPL_sum = df3['RPL_exon'].sum() + df3['RPL_intron'].sum()
 df3['exonic_tpm_recalc'] = 1e6*df3['RPL_exon']/RPL_sum
 df3['intronic_tpm_recalc'] = 1e6*df3['RPL_intron']/RPL_sum
-
 #Also combine the intronic and exonic counts
 #call it summed_tpm and summed_est_counts to indicate it's summed over all transcripts and intronic, exonic
 df3['summed_tpm'] = df3['intronic_tpm'] + df3['exonic_tpm']
 df3['summed_tpm_recalc'] = df3['intronic_tpm_recalc'] + df3['exonic_tpm_recalc']
 df3['summed_est_counts'] = df3['intronic_est_counts'] + df3['exonic_est_counts']
-
 cols = df3.columns.tolist()
 cols.insert(0, cols.pop(cols.index('symbol')))
 cols.insert(0, cols.pop(cols.index('gene')))
 cols = [i for i in cols if i not in ['RPL_exon', 'RPL_intron']]
-df3[cols].to_csv(snakemake.output['gene_table'])
+df3[cols].to_csv(snakemake.output['gene_table'], index=False)

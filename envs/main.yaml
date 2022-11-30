@@ -5,13 +5,6 @@ channels:
 dependencies:
   - python>=3.6
   - gffutils=0.10.1
-  - biopython
-  - samtools
-  - bedtools
-  - deeptools
-  - star=2.5.3a
-  - pandas=0.25.3
+  - pandas=1.4
   - kallisto=0.46.2
-  - bioconda::rseqc=3.0
-  - htseq
   - bbmap=38.73
